@@ -1,0 +1,42 @@
+#!/bin/bash
+
+ADDRESS_BOOK="addressbook.txt"
+
+# Перевірка наявності файлу адресної книги та його створення, якщо він відсутній
+touch "$ADDRESS_BOOK"
+
+case $1 in
+    new)
+        echo "$2 $3" >> "$ADDRESS_BOOK"
+        echo "Додано запис: $2 $3"
+        ;;
+    list)
+        if [ -s "$ADDRESS_BOOK" ]; then
+            cat "$ADDRESS_BOOK"
+        else
+            echo "Адресна книга порожня"
+        fi
+        ;;
+    remove)
+        grep -v "$2" "$ADDRESS_BOOK" > "$ADDRESS_BOOK.tmp" && mv "$ADDRESS_BOOK.tmp" "$ADDRESS_BOOK"
+        echo "Видалено записи для: $2"
+        ;;
+    clear)
+        > "$ADDRESS_BOOK"
+        echo "Адресна книга очищена"
+        ;;
+    lookup)
+        if grep -q "$2" "$ADDRESS_BOOK"; then
+            if [ -n "$2" ]; then
+                grep "$2" "$ADDRESS_BOOK" | awk '{print $2}'
+            else
+                grep "$2" "$ADDRESS_BOOK"
+            fi
+        else
+            echo "Ім'я не знайдено в адресній книзі"
+        fi
+        ;;
+    *)
+        echo "Неправильна команда. Використовуйте: new, list, remove, clear, lookup"
+        ;;
+esac
